@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.10.13
+### add Rohrmotor-Aktor 9471-3 (35200662)
+
 ## 0.10.12
 ### add Homepilot garage door opener (16901001)
 
