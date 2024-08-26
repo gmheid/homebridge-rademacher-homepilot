@@ -23,8 +23,8 @@ function RademacherEnvironmentSensorAccessory(log, debug, accessory, sensor, ses
     this.services.push(lightService);
      // Rain sensor
     this.currentRainState=this.sensor.readings.rain_detected;
-    var rainsensorService = this.accessory.getService(global.Service.LeakSensor);
-    rainsensorService.getCharacteristic(global.Characteristic.LeakDetected)
+    var rainsensorService = this.accessory.getService(global.Service.ContactSensor);
+    rainsensorService.getCharacteristic(global.Characteristic.ContactSensorState)
         .setValue(this.currentRainState)
         .on('get', this.getCurrentRainState.bind(this));
     this.services.push(rainsensorService);
@@ -73,8 +73,8 @@ RademacherEnvironmentSensorAccessory.prototype.getCurrentRainState = function (c
             {
                 self.currentRainState=data.readings.rain_detected
                 if (self.debug) self.log("%s [%s] - getCurrentRainState(): rain_detected=%s", self.accessory.displayName, self.sensor.did, self.currentRainState);
-                var rainsensorService = self.accessory.getService(global.Service.LeakSensor);
-                rainsensorService.getCharacteristic(global.Characteristic.LeakDetected).updateValue(self.currentRainState);
+                var rainsensorService = self.accessory.getService(global.Service.ContactSensor);
+                rainsensorService.getCharacteristic(global.Characteristic.ContactSensorState).updateValue(self.currentRainState);
             
             }
         });

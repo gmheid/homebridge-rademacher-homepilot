@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.10.14
+### use contact sensor for rain sensor instead of leak sensor
+
 ## 0.10.13
 ### add Rohrmotor-Aktor 9471-3 (35200662)
 
