@@ -321,7 +321,7 @@ RademacherHomePilot.prototype.addSmokeAlarmAccessory = function(sensor) {
         name = sensor.description;
     var accessory = new global.Accessory(name, UUIDGen.generate("did"+sensor.did));
     accessory.addService(global.Service.SmokeSensor, name);
-    accessory.addService(global.Service.BatteryService, name);
+    accessory.addService(global.Service.Battery, name);
     this.accessories[accessory.UUID] = new RademacherSmokeAlarmAccessory(this.log, this.debug, accessory, sensor, this.session);
     this.api.registerPlatformAccessories("homebridge-rademacher-homepilot", "RademacherHomePilot", [accessory]);
     this.log("Added smoke alarm: %s - %s [%s]", sensor.name, sensor.description, sensor.did);
@@ -421,7 +421,7 @@ RademacherHomePilot.prototype.addDoorSensorAccessory = function(sensor) {
         name = sensor.description;
     var accessory = new global.Accessory(name, UUIDGen.generate("did"+sensor.did));
     accessory.addService(global.Service.ContactSensor, name);
-    accessory.addService(global.Service.BatteryService, name);
+    accessory.addService(global.Service.Battery, name);
     this.accessories[accessory.UUID] = new RademacherDoorSensorAccessory(this.log, this.debug, accessory, sensor, this.session);
     this.api.registerPlatformAccessories("homebridge-rademacher-homepilot", "RademacherHomePilot", [accessory]);
     this.log("Added door sensor: %s - %s [%s]", sensor.name, sensor.description, sensor.did);

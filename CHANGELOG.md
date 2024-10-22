@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.11.0
+### prepare for homebridge v2
+
 ## 0.10.14
 ### use contact sensor for rain sensor instead of leak sensor
 

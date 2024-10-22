@@ -14,7 +14,7 @@ function RademacherDoorSensorAccessory(log, debug, accessory, sensor, session) {
     this.services.push(contactsensorService);
     // battery
     this.currentBatteryLevel=this.sensor.batteryStatus;
-    var batteryService = this.accessory.getService(global.Service.BatteryService);
+    var batteryService = this.accessory.getService(global.Service.Battery);
     batteryService.getCharacteristic(global.Characteristic.BatteryLevel)
         .setValue(this.currentBatteryLevel)
         .on('get', this.getCurrentBatteryLevel.bind(this));
@@ -65,7 +65,7 @@ RademacherDoorSensorAccessory.prototype.getCurrentBatteryLevel = function (callb
             {
                 self.currentBatteryLevel=data.batteryStatus;
                 if (self.debug) self.log("%s [%s] - getCurrentBatteryLevel(): battery status=%s", self.accessory.displayName, self.sensor.did, self.currentBatteryLevel);
-                var batteryService = self.accessory.getService(global.Service.BatteryService);
+                var batteryService = self.accessory.getService(global.Service.Battery);
                 batteryService.getCharacteristic(Characteristic.BatteryLevel).updateValue(self.currentBatteryLevel);
                 }            
         });
