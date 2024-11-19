@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.11.1
+### add actor of movement sensor (9484)
+
 ## 0.11.0
 ### prepare for homebridge v2
 
