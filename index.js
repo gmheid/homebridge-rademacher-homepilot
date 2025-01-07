@@ -12,6 +12,7 @@ var RademacherTemperatureSensorAccessory = require ('./accessories/RademacherTem
 var RademacherDoorSensorAccessory = require ('./accessories/RademacherDoorSensorAccessory.js');
 var RademacherThermostatAccessory = require('./accessories/RademacherThermostatAccessory.js');
 var RademacherSceneAccessory = require ('./accessories/RademacherSceneAccessory.js');
+var RademacherLightAccessory = require ('./accessories/RademacherLightbulbAccessory.js');
 
 module.exports = function(homebridge) {
     global.Accessory = homebridge.platformAccessory;
@@ -168,6 +169,20 @@ function RademacherHomePilot(log, config, api) {
                         {
                             self.addSunSensorAccessory(accessory, data);
                         }
+                        // Lightbulb and AddZ (Zigbee) - only lightbulbs are supported at the moment!
+                        // E14 Light&Color: 35144001
+                        // E27 Light&Color: 35274001
+                        // Hue Playbar Light&Color: 99999975
+                        else if (["35144001","35274001","99999975"].includes(data.deviceNumber))
+                        {
+                        	if (accessory === undefined) {
+                                self.addLightbulbAccessory(data);
+                            }
+                            else {
+                                self.log("lightbulb is online: %s [%s]", accessory.displayName, data.did);
+	                        	self.accessories[uuid] = new RademacherLightbulbAccessory(self.log, self.debug, (accessory instanceof RademacherLightbulbAccessory ? accessory.accessory : accessory), data, self.session, self.inverted);
+	                        }
+                        }	
                         // unknown
                         else
                         {
@@ -471,6 +486,22 @@ RademacherHomePilot.prototype.addSwitchAccessory = function(sw) {
     this.api.registerPlatformAccessories("homebridge-rademacher-homepilot", "RademacherHomePilot", [accessory]);
     this.log("Added switch: %s - %s [%s]", sw.name, sw.description, sw.did);
 };
+
+RademacherHomePilot.prototype.addLightbulbAccessory = function(lb) {
+    this.log("Found lightbulb: %s - %s [%s]", lb.name, lb.description, lb.did);
+
+    var name = null;
+    if(!lb.description.trim())
+        name = lb.name;
+    else
+        name = lb.description;
+    var accessory = new global.Accessory(name, UUIDGen.generate("did"+lb.did));
+    accessory.addService(global.Service.Lightbulb, name);
+    this.accessories[accessory.UUID] = new RademacherLightAccessory(this.log, this.debug, accessory, lb, this.session);
+    this.api.registerPlatformAccessories("homebridge-rademacher-homepilot", "RademacherHomePilot", [accessory]);
+    this.log("Added lightbulb: %s - %s [%s]", lb.name, lb.description, lb.did);
+};
+
 
 RademacherHomePilot.prototype.addSceneAccessory = function(scene) {
     this.log("Found scene: %s - %s [%s]", scene.name, scene.description, scene.sid);
