@@ -10,28 +10,30 @@ function RademacherThermostatAccessory(log, debug, accessory, thermostat, sessio
     this.currentTemperature = tools.duofernTemp2HomekitTemp(this.thermostat.statusesMap.acttemperatur);
     this.lastTemperature = this.currentTemperature;
     this.targetTemperature = tools.duofernTemp2HomekitTemp(this.thermostat.statusesMap.Position);
+    this.targetState = global.Characteristic.CurrentHeatingCoolingState.HEAT; // TargetState immer HEAT!! Hier steuert man den Modus.
+    this.currentState = this.thermostat.statusesMap.relaisstatus;
 
-    this.fixedState = global.Characteristic.CurrentHeatingCoolingState.HEAT;
-
+//    this.fixedState = global.Characteristic.CurrentHeatingCoolingState.HEAT;
+    
     this.service = this.accessory.getService(global.Service.Thermostat);
 
     this.service.getCharacteristic(global.Characteristic.CurrentHeatingCoolingState)
-        .setValue(this.fixedState)
+        .setValue(this.currentState)
         .setProps({
-            minValue: this.fixedState,
-            maxValue: this.fixedState,
+            minValue: global.Characteristic.CurrentHeatingCoolingState.OFF,
+            maxValue: global.Characteristic.CurrentHeatingCoolingState.HEAT,
             minStep: 1,
-            validValues: [this.fixedState],
+            validValues: [global.Characteristic.CurrentHeatingCoolingState.OFF,global.Characteristic.CurrentHeatingCoolingState.HEAT],
           })
         .on('get', this.getCurrentHeatingCoolingState.bind(this));
 
     this.service.getCharacteristic(global.Characteristic.TargetHeatingCoolingState)
-        .setValue(this.fixedState)
+        .setValue(this.targetState)
         .setProps({
-            minValue: this.fixedState,
-            maxValue: this.fixedState,
+            minValue: global.Characteristic.CurrentHeatingCoolingState.HEAT,
+            maxValue: global.Characteristic.CurrentHeatingCoolingState.HEAT,
             minStep: 1,
-            validValues: [this.fixedState],
+            validValues: [global.Characteristic.CurrentHeatingCoolingState.HEAT],
           })
         .on('get', this.getTargetHeatingCoolingState.bind(this))
         .on('set', this.setTargetHeatingCoolingState.bind(this));
@@ -61,16 +63,27 @@ function RademacherThermostatAccessory(log, debug, accessory, thermostat, sessio
 
     this.service.getCharacteristic(global.Characteristic.CurrentRelativeHumidity)
         .setValue(50)
-
+    
     // TODO configure interval
-    setInterval(this.update.bind(this), 10000);
+    setInterval(this.update.bind(this),10000);
 }
 
 RademacherThermostatAccessory.prototype = Object.create(RademacherAccessory.prototype);
 
 RademacherThermostatAccessory.prototype.getCurrentHeatingCoolingState = function(callback) {
-    if (this.debug) this.log("%s [%s] - getCurrentHeatingCoolingState(): state=%s", this.accessory.displayName, this.thermostat.did, this.fixedState);
-    callback(null, this.fixedState);
+    if (this.debug) this.log("%s [%s] - getCurrentHeatingCoolingState()", this.accessory.displayName, this.thermostat.did);
+    callback(null,this.currentState);
+    var self = this;
+    this.getDevice(function(err, data) {
+        if(err) 
+        {
+            self.log("%s [%s] - getCurrentHeatingCoolingState(): error=%s", self.accessory.displayName, self.thermostat.did,err);
+            return;
+        }
+        self.currentState = data.statusesMap.relaisstatus;
+        if (self.debug) self.log("%s [%s] - getCurrentHeatingCoolingState(): current state is %d", self.accessory.displayName, self.thermostat.did,self.currentState);
+        self.service.getCharacteristic(global.Characteristic.CurrentHeatingCoolingState).updateValue(self.currentState)
+    });
 };
 
 RademacherThermostatAccessory.prototype.getCurrentTemperature = function(callback) {
@@ -123,8 +136,8 @@ RademacherThermostatAccessory.prototype.setTargetTemperature = function(temperat
 
 RademacherThermostatAccessory.prototype.getTargetHeatingCoolingState = function(callback) {
     if (this.debug) this.log("%s [%s] - getTargetHeatingCoolingState()", this.accessory.displayName,this.thermostat.did);
-    return callback(null, this.fixedState);
-};
+    return callback(null, global.Characteristic.TargetHeatingCoolingState.HEAT);
+}
 
 RademacherThermostatAccessory.prototype.setTargetHeatingCoolingState = function(state, callback, context) {
     if (this.debug) this.log("%s [%s] - setTargetHeatingCoolingState(%s) (ignored)", this.accessory.displayName,this.thermostat.did,state);
@@ -166,6 +179,20 @@ RademacherThermostatAccessory.prototype.update = function() {
         }
     }.bind(this));
 
+    this.getCurrentHeatingCoolingState(function(err, state) {
+        if (err)
+        {
+            self.log(`%s [%s] - update().getCurrentHeatingCoolingState(): error=%s`, this.accessory.displayName, this.thermostat.did, err);
+        }
+        else if(state===null)
+        {
+            self.log(`%s [%s] - update().getCurrentHeatingCoolingState(): got null state`, this.accessory.displayName, this.thermostat.did);
+        }
+        else
+        {
+            if (self.debug) self.log(`%s [%s] - update().getCurrentHeatingCoolingState(): state=%s`, this.accessory.displayName, this.thermostat.did, state);
+        }
+    }.bind(this));
 };
 
 RademacherThermostatAccessory.prototype.getTemperatureDisplayUnits = function(callback) {
