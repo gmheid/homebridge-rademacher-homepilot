@@ -10,11 +10,9 @@ function RademacherThermostatAccessory(log, debug, accessory, thermostat, sessio
     this.currentTemperature = tools.duofernTemp2HomekitTemp(this.thermostat.statusesMap.acttemperatur);
     this.lastTemperature = this.currentTemperature;
     this.targetTemperature = tools.duofernTemp2HomekitTemp(this.thermostat.statusesMap.Position);
-    this.targetState = global.Characteristic.CurrentHeatingCoolingState.HEAT; // TargetState immer HEAT!! Hier steuert man den Modus.
-    this.currentState = this.thermostat.statusesMap.relaisstatus;
+    this.targetState = global.Characteristic.CurrentHeatingCoolingState.HEAT;
+    this.currentState = global.Characteristic.CurrentHeatingCoolingState.HEAT;
 
-//    this.fixedState = global.Characteristic.CurrentHeatingCoolingState.HEAT;
-    
     this.service = this.accessory.getService(global.Service.Thermostat);
 
     this.service.getCharacteristic(global.Characteristic.CurrentHeatingCoolingState)
@@ -80,7 +78,7 @@ RademacherThermostatAccessory.prototype.getCurrentHeatingCoolingState = function
             self.log("%s [%s] - getCurrentHeatingCoolingState(): error=%s", self.accessory.displayName, self.thermostat.did,err);
             return;
         }
-        self.currentState = data.statusesMap.relaisstatus;
+        self.currentState = data.statusesMap.relaisstatus || global.Characteristic.CurrentHeatingCoolingState.HEAT;
         if (self.debug) self.log("%s [%s] - getCurrentHeatingCoolingState(): current state is %d", self.accessory.displayName, self.thermostat.did,self.currentState);
         self.service.getCharacteristic(global.Characteristic.CurrentHeatingCoolingState).updateValue(self.currentState)
     });
