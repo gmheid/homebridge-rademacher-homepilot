@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.12.1
+### add default state of heater relais
+
 ## 0.12.0
 ### add more blinds and thermostats
 ### show state of heater relais
