@@ -11,7 +11,14 @@ function RademacherThermostatAccessory(log, debug, accessory, thermostat, sessio
     this.lastTemperature = this.currentTemperature;
     this.targetTemperature = tools.duofernTemp2HomekitTemp(this.thermostat.statusesMap.Position);
     this.targetState = global.Characteristic.CurrentHeatingCoolingState.HEAT;
-    this.currentState = global.Characteristic.CurrentHeatingCoolingState.HEAT;
+    if (this.thermostat.statusesMap.hasOwnProperty("relaisstatus"))
+    {
+ 	   	this.currentState = this.thermostat.statusesMap.relaisstatus;
+ 	}
+ 	else
+ 	{
+ 		this.currentState = global.Characteristic.CurrentHeatingCoolingState.HEAT;
+ 	}
 
     this.service = this.accessory.getService(global.Service.Thermostat);
 
@@ -78,7 +85,14 @@ RademacherThermostatAccessory.prototype.getCurrentHeatingCoolingState = function
             self.log("%s [%s] - getCurrentHeatingCoolingState(): error=%s", self.accessory.displayName, self.thermostat.did,err);
             return;
         }
-        self.currentState = data.statusesMap.relaisstatus || global.Characteristic.CurrentHeatingCoolingState.HEAT;
+        if (data.statusesMap.hasOwnProperty("relaisstatus"))
+     	{
+ 	    	self.currentState = data.statusesMap.relaisstatus;
+ 		}
+ 		else
+ 		{
+ 			self.currentState = global.Characteristic.CurrentHeatingCoolingState.HEAT;
+ 		}
         if (self.debug) self.log("%s [%s] - getCurrentHeatingCoolingState(): current state is %d", self.accessory.displayName, self.thermostat.did,self.currentState);
         self.service.getCharacteristic(global.Characteristic.CurrentHeatingCoolingState).updateValue(self.currentState)
     });
