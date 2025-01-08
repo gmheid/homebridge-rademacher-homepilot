@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.12.0
+### add more blinds and thermostats
+### show state of heater relais
+
 ## 0.11.1
 ### add actor of movement sensor (9484)
 
