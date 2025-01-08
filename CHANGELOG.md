@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.12.2
+### fix add default state of heater relais
+
 ## 0.12.1
 ### add default state of heater relais
 
