@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.12.3
+### allow node 22
+
 ## 0.12.2
 ### fix add default state of heater relais
 
